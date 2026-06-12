@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SoundCircle — Estudo de Monetização</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-primary: #0b0b17;
+      --bg-secondary: #1a1a2e;
+      --bg-tertiary: #25253e;
+      --neon-purple: #a78bfa;
+      --neon-cyan: #2dd4bf;
+      --neon-green: #34d399;
+      --neon-amber: #fbbf24;
+      --neon-rose: #fb7185;
+      --neon-purple-glow: rgba(167, 139, 250, 0.2);
+      --neon-cyan-glow: rgba(45, 212, 191, 0.2);
+      --text-primary: #f1f1f6;
+      --text-secondary: #9d9db5;
+      --text-muted: #6b6b85;
+      --glass-bg: rgba(26, 26, 46, 0.65);
+      --glass-border: rgba(167, 139, 250, 0.12);
+      --radius: 16px;
+      --radius-sm: 10px;
+      --radius-lg: 24px;
+      --font-display: 'Plus Jakarta Sans', sans-serif;
+      --font-body: 'DM Sans', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: var(--font-body);
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background:
+        radial-gradient(ellipse 60% 40% at 10% 10%, rgba(167, 139, 250, 0.08) 0%, transparent 60%),
+        radial-gradient(ellipse 50% 30% at 90% 80%, rgba(45, 212, 191, 0.06) 0%, transparent 60%);
+      pointer-events: none; z-index: 0;
+    }
+    .noise-overlay {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      opacity: 0.02;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+      pointer-events: none; z-index: 0;
+    }
+    .container { max-width: 1100px; margin: 0 auto; padding: 0 20px; position: relative; z-index: 1; }
+
+    /* Particles */
+    .particles {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      pointer-events: none; z-index: 0; overflow: hidden;
+    }
+    .particle {
+      position: absolute; width: 3px; height: 3px;
+      background: var(--neon-purple); border-radius: 50%; opacity: 0;
+      animation: float 10s infinite ease-in-out;
+    }
+    .particle:nth-child(1) { left: 8%; top: 15%; animation-delay: 0s; background: var(--neon-cyan); }
+    .particle:nth-child(2) { left: 22%; top: 55%; animation-delay: 1.5s; }
+    .particle:nth-child(3) { left: 42%; top: 10%; animation-delay: 2.8s; width: 2px; height: 2px; background: var(--neon-cyan); }
+    .particle:nth-child(4) { left: 60%; top: 72%; animation-delay: 0.7s; }
+    .particle:nth-child(5) { left: 78%; top: 25%; animation-delay: 2.0s; width: 2px; background: var(--neon-cyan); }
+    .particle:nth-child(6) { left: 12%; top: 80%; animation-delay: 3.2s; }
+    .particle:nth-child(7) { left: 52%; top: 42%; animation-delay: 0.4s; width: 4px; height: 4px; background: var(--neon-cyan); }
+    .particle:nth-child(8) { left: 88%; top: 8%; animation-delay: 2.4s; }
+    .particle:nth-child(9) { left: 32%; top: 88%; animation-delay: 1.0s; width: 2px; background: var(--neon-cyan); }
+    .particle:nth-child(10) { left: 70%; top: 48%; animation-delay: 3.8s; }
+    @keyframes float {
+      0%, 100% { opacity: 0; transform: translateY(0) scale(0.5); }
+      25% { opacity: 0.5; }
+      50% { opacity: 0.2; transform: translateY(-35px) scale(1); }
+      75% { opacity: 0.5; }
+    }
+
+    .header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 20px 0; margin-bottom: 24px;
+      border-bottom: 1px solid var(--glass-border);
+    }
+    .logo {
+      font-family: var(--font-display); font-size: 1.3rem; font-weight: 800;
+      background: linear-gradient(135deg, var(--neon-purple), var(--neon-cyan));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .header-tag {
+      font-size: 0.82rem; color: var(--text-muted);
+    }
+
+    .hero-mini {
+      text-align: center; padding: 32px 0 24px;
+    }
+    .hero-mini .badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: rgba(167, 139, 250, 0.08); border: 1px solid rgba(167, 139, 250, 0.15);
+      border-radius: 20px; padding: 4px 14px 4px 4px;
+      font-size: 0.78rem; color: var(--neon-purple); margin-bottom: 12px;
+    }
+    .hero-mini .badge .dot {
+      width: 7px; height: 7px; background: var(--neon-cyan);
+      border-radius: 50%; animation: pulse-dot 2s infinite;
+    }
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(1.2); }
+    }
+    .hero-mini h1 {
+      font-family: var(--font-display); font-size: clamp(2rem, 4vw, 3rem);
+      font-weight: 800; letter-spacing: -1.5px; margin-bottom: 10px;
+    }
+    .hero-mini h1 .gradient-text {
+      background: linear-gradient(135deg, var(--neon-purple), var(--neon-cyan));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .hero-mini p { color: var(--text-secondary); font-size: 1rem; max-width: 600px; margin: 0 auto; }
+
+    .section-title {
+      font-family: var(--font-display); font-size: 1.5rem; font-weight: 700;
+      margin-bottom: 4px; letter-spacing: -0.5px;
+    }
+    .section-sub { color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 24px; }
+    .divider { height: 1px; background: var(--glass-border); margin: 40px 0; }
+
+    /* Stats bar */
+    .stats-bar {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 40px;
+    }
+    .stat-card {
+      background: var(--glass-bg); backdrop-filter: blur(16px);
+      border: 1px solid var(--glass-border); border-radius: var(--radius-sm);
+      padding: 20px; text-align: center; transition: all 0.3s;
+    }
+    .stat-card:hover { border-color: rgba(167, 139, 250, 0.25); transform: translateY(-2px); }
+    .stat-card .num {
+      font-family: var(--font-display); font-size: 1.6rem; font-weight: 700;
+      background: linear-gradient(135deg, var(--neon-purple), var(--neon-cyan));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .stat-card .lbl { font-size: 0.78rem; color: var(--text-muted); margin-top: 2px; }
+
+    /* Revenue sources grid */
+    .revenue-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px; margin-bottom: 32px;
+    }
+    .rev-card {
+      background: var(--glass-bg); backdrop-filter: blur(16px);
+      border: 1px solid var(--glass-border); border-radius: var(--radius);
+      padding: 20px; transition: all 0.3s; position: relative; overflow: hidden;
+    }
+    .rev-card::before {
+      content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 3px;
+      opacity: 0; transition: opacity 0.3s;
+    }
+    .rev-card:hover::before { opacity: 1; }
+    .rev-card:hover { border-color: rgba(167, 139, 250, 0.25); transform: translateY(-3px); }
+    .rev-card.purple::before { background: linear-gradient(90deg, var(--neon-purple), #7c5cfc); }
+    .rev-card.cyan::before { background: linear-gradient(90deg, var(--neon-cyan), #06b6d4); }
+    .rev-card.amber::before { background: linear-gradient(90deg, var(--neon-amber), #f59e0b); }
+    .rev-card.rose::before { background: linear-gradient(90deg, var(--neon-rose), #e11d48); }
+    .rev-card.green::before { background: linear-gradient(90deg, var(--neon-green), #10b981); }
+
+    .rev-card .r-icon {
+      width: 40px; height: 40px; border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 12px;
+    }
+    .rev-card .r-icon.purple-bg { background: rgba(167, 139, 250, 0.12); }
+    .rev-card .r-icon.cyan-bg { background: rgba(45, 212, 191, 0.12); }
+    .rev-card .r-icon.amber-bg { background: rgba(251, 191, 36, 0.12); }
+    .rev-card .r-icon.rose-bg { background: rgba(251, 113, 133, 0.12); }
+    .rev-card .r-icon.green-bg { background: rgba(52, 211, 153, 0.12); }
+
+    .rev-card .r-number {
+      font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px;
+    }
+    .rev-card h3 {
+      font-family: var(--font-display); font-size: 1rem; font-weight: 600;
+      margin-bottom: 4px;
+    }
+    .rev-card .r-desc {
+      font-size: 0.8rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: 10px;
+    }
+    .rev-card .r-revenue {
+      font-family: var(--font-display); font-size: 1.1rem; font-weight: 700;
+    }
+    .rev-card .r-revenue.purple-t { color: var(--neon-purple); }
+    .rev-card .r-revenue.cyan-t { color: var(--neon-cyan); }
+    .rev-card .r-revenue.amber-t { color: var(--neon-amber); }
+
+    /* Comparison table */
+    .table-wrap {
+      overflow-x: auto; margin-bottom: 32px;
+      background: var(--glass-bg); backdrop-filter: blur(16px);
+      border: 1px solid var(--glass-border); border-radius: var(--radius);
+      padding: 20px;
+    }
+    table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+    thead th {
+      text-align: left; padding: 12px 14px; font-weight: 600;
+      color: var(--text-muted); border-bottom: 1px solid var(--glass-border);
+      font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.5px;
+    }
+    tbody td { padding: 12px 14px; border-bottom: 1px solid rgba(167, 139, 250, 0.06); }
+    tbody tr:last-child td { border-bottom: none; }
+    tbody tr:hover { background: rgba(167, 139, 250, 0.04); }
+    .positive { color: var(--neon-green); font-weight: 600; }
+    .highlight-purple { color: var(--neon-purple); }
+    .highlight-cyan { color: var(--neon-cyan); }
+    .highlight-amber { color: var(--neon-amber); }
+
+    /* Chart bars */
+    .chart-section { margin-bottom: 32px; }
+    .chart-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 20px;
+    }
+    .chart-card {
+      background: var(--glass-bg); backdrop-filter: blur(16px);
+      border: 1px solid var(--glass-border); border-radius: var(--radius);
+      padding: 24px;
+    }
+    .chart-card h3 {
+      font-family: var(--font-display); font-size: 1rem; font-weight: 600; margin-bottom: 16px;
+    }
+
+    .bar-group {
+      display: flex; align-items: flex-end; gap: 8px; height: 200px; padding: 0 8px;
+      position: relative;
+    }
+    .bar-item {
+      flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px;
+      height: 100%; justify-content: flex-end;
+    }
+    .bar-fill {
+      width: 100%; border-radius: 4px 4px 0 0;
+      transition: height 0.6s ease; min-height: 4px;
+      position: relative;
+    }
+    .bar-fill .bar-val {
+      position: absolute; top: -22px; left: 50%; transform: translateX(-50%);
+      font-size: 0.75rem; font-weight: 600; white-space: nowrap;
+    }
+    .bar-fill.purple-b { background: linear-gradient(to top, var(--neon-purple), #7c5cfc); }
+    .bar-fill.cyan-b { background: linear-gradient(to top, var(--neon-cyan), #06b6d4); }
+    .bar-fill.amber-b { background: linear-gradient(to top, var(--neon-amber), #f59e0b); }
+    .bar-fill.green-b { background: linear-gradient(to top, var(--neon-green), #10b981); }
+    .bar-fill.rose-b { background: linear-gradient(to top, var(--neon-rose), #e11d48); }
+
+    .bar-label { font-size: 0.68rem; color: var(--text-muted); text-align: center; }
+
+    /* Timeline */
+    .timeline {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px;
+    }
+    .tl-card {
+      background: var(--glass-bg); backdrop-filter: blur(16px);
+      border: 1px solid var(--glass-border); border-radius: var(--radius);
+      padding: 20px; position: relative; transition: all 0.3s;
+    }
+    .tl-card:hover { border-color: rgba(167, 139, 250, 0.25); transform: translateY(-3px); }
+    .tl-card .tl-phase {
+      font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px;
+      color: var(--text-muted); margin-bottom: 4px;
+    }
+    .tl-card .tl-title {
+      font-family: var(--font-display); font-size: 1.2rem; font-weight: 700;
+      margin-bottom: 4px;
+    }
+    .tl-card .tl-range {
+      font-size: 0.78rem; color: var(--neon-cyan); margin-bottom: 8px;
+    }
+    .tl-card .tl-desc {
+      font-size: 0.8rem; color: var(--text-secondary); line-height: 1.5;
+    }
+    .tl-card .tl-dot {
+      width: 12px; height: 12px; border-radius: 50%; margin-bottom: 10px;
+    }
+    .tl-card .tl-dot.purple-d { background: var(--neon-purple); box-shadow: 0 0 12px var(--neon-purple-glow); }
+    .tl-card .tl-dot.cyan-d { background: var(--neon-cyan); box-shadow: 0 0 12px var(--neon-cyan-glow); }
+    .tl-card .tl-dot.amber-d { background: var(--neon-amber); }
+    .tl-card .tl-dot.green-d { background: var(--neon-green); }
+
+    /* Premissas */
+    .prem-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px;
+    }
+    .prem-item {
+      background: var(--bg-tertiary); border: 1px solid var(--glass-border);
+      border-radius: var(--radius-sm); padding: 14px 16px;
+    }
+    .prem-item .p-key {
+      font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;
+    }
+    .prem-item .p-val {
+      font-family: var(--font-display); font-size: 1.1rem; font-weight: 600;
+    }
+    .prem-item .p-ref {
+      font-size: 0.72rem; color: var(--text-secondary);
+    }
+
+    /* Badge */
+    .badge {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 2px 10px; border-radius: 12px; font-size: 0.72rem; font-weight: 500;
+    }
+    .badge-purple { background: rgba(167, 139, 250, 0.1); color: var(--neon-purple); }
+    .badge-cyan { background: rgba(45, 212, 191, 0.1); color: var(--neon-cyan); }
+    .badge-green { background: rgba(52, 211, 153, 0.1); color: var(--neon-green); }
+    .badge-amber { background: rgba(251, 191, 36, 0.1); color: var(--neon-amber); }
+
+    .glow-number {
+      font-family: var(--font-display); font-size: 2.5rem; font-weight: 800;
+      background: linear-gradient(135deg, var(--neon-purple), var(--neon-cyan));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+
+    /* Footer */
+    .footer {
+      padding: 20px 0; border-top: 1px solid var(--glass-border);
+      text-align: center; font-size: 0.78rem; color: var(--text-muted);
+    }
+
+    /* SVG icons */
+    .icon { width: 20px; height: 20px; stroke: currentColor; stroke-width: 2; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+    .icon-sm { width: 16px; height: 16px; }
+    .icon-lg { width: 22px; height: 22px; }
+
+    @media (max-width: 768px) {
+      .stats-bar { grid-template-columns: repeat(2, 1fr); }
+      .chart-grid { grid-template-columns: 1fr; }
+      .timeline { grid-template-columns: 1fr; }
+      .revenue-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="noise-overlay"></div>
+  <div class="particles">
+    <div class="particle"></div><div class="particle"></div><div class="particle"></div>
+    <div class="particle"></div><div class="particle"></div><div class="particle"></div>
+    <div class="particle"></div><div class="particle"></div><div class="particle"></div>
+    <div class="particle"></div>
+  </div>
+
+  <div class="container">
+    <header class="header">
+      <div class="logo">SoundCircle</div>
+      <span class="header-tag">Estudo de Monetização &bull; 100k usuários</span>
+    </header>
+
+    <div class="hero-mini">
+      <div class="badge">
+        <span class="dot"></span>
+        Projeção Financeira &bull; Cenário Moderado
+      </div>
+      <h1>Potencial de <span class="gradient-text">Receita</span></h1>
+      <p>Análise detalhada de 8 fontes de receita para o SoundCircle, com projeções realistas baseadas em benchmarks do mercado (Fiverr, LinkedIn, Instagram, Bandcamp).</p>
+    </div>
+
+    <!-- Stats Bar -->
+    <div class="stats-bar">
+      <div class="stat-card">
+        <div class="num">100k</div>
+        <div class="lbl">Usuários Ativos (MAU)</div>
+      </div>
+      <div class="stat-card">
+        <div class="num">$1.7M</div>
+        <div class="lbl">Receita Anual (moderado)</div>
+      </div>
+      <div class="stat-card">
+        <div class="num">6-9</div>
+        <div class="lbl">Meses p/ Break-even</div>
+      </div>
+      <div class="stat-card">
+        <div class="num">65%</div>
+        <div class="lbl">Margem Líquida</div>
+      </div>
+    </div>
+
+    <!-- 8 Revenue Streams -->
+    <h2 class="section-title">8 Fontes de Receita</h2>
+    <p class="section-sub">Cada uma com modelo, benchmark real e projeção mensal</p>
+
+    <div class="revenue-grid">
+      <div class="rev-card purple">
+        <div class="r-icon purple-bg">
+          <svg class="icon-lg" viewBox="0 0 24 24" stroke="var(--neon-purple)"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+        </div>
+        <div class="r-number">Stream 1</div>
+        <h3>SoundCircle Premium</h3>
+        <div class="r-desc">Assinatura mensal com analytics avançados, upload ilimitado e destaque nas buscas. Conversão estimada de 4%.</div>
+        <div class="r-revenue purple-t">$40k/mês</div>
+        <div style="margin-top:6px;display:flex;gap:4px">
+          <span class="badge badge-purple">$9.99/mês</span>
+          <span class="badge badge-cyan">4% conversão</span>
+        </div>
+      </div>
+
+      <div class="rev-card cyan">
+        <div class="r-icon cyan-bg">
+          <svg class="icon-lg" viewBox="0 0 24 24" stroke="var(--neon-cyan)"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        </div>
+        <div class="r-number">Stream 2</div>
+        <h3>Collab Hub — Taxa</h3>
+        <div class="r-desc">15% sobre cada transação de colaboração entre músicos. Ticket médio de $300, 1.600 transações/mês.</div>
+        <div class="r-revenue cyan-t">$72k/mês</div>
+        <div style="margin-top:6px;display:flex;gap:4px">
+          <span class="badge badge-cyan">15% fee</span>
+          <span class="badge badge-purple">$300 avg</span>
+        </div>
+      </div>
+
+      <div class="rev-card amber">
+        <div class="r-icon amber-bg">
+          <svg class="icon-lg" viewBox="0 0 24 24" stroke="var(--neon-amber)"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        </div>
+        <div class="r-number">Stream 3</div>
+        <h3>Perfil em Destaque</h3>
+        <div class="r-desc">Músicos pagam para aparecer no topo do Discover. 600 perfis em destaque por mês.</div>
+        <div class="r-revenue amber-t">$12k/mês</div>
+        <div style="margin-top:6px;display:flex;gap:4px">
+          <span class="badge badge-purple">$19.99/mês</span>
+          <span class="badge badge-amber">600 destques</span>
+        </div>
+      </div>
+
+      <div class="rev-card rose">
+        <div class="r-icon rose-bg">
+          <svg class="icon-lg" viewBox="0 0 24 24" stroke="var(--neon-rose)"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+        </div>
+        <div class="r-number">Stream 4</div>
+        <h3>Posts Impulsionados</h3>
+        <div class="r-desc">Músicos pagam para impulsionar posts no Feed. Alcance garantido para engajamento.</div>
+        <div class="r-revenue" style="color:var(--neon-rose)">$8k/mês</div>
+        <div style="margin-top:6px;display:flex;gap:4px">
+          <span class="badge badge-purple">$14.99 avg</span>
+          <span class="badge badge-cyan">530 posts</span>
+        </div>
+      </div>
+
+      <div class="rev-card green">
+        <div class="r-icon green-bg">
+          <svg class="icon-lg" viewBox="0 0 24 24" stroke="var(--neon-green)"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        </div>
+        <div class="r-number">Stream 5</div>
+        <h3>Gorjetas & Apoio</h3>
+        <div class="r-desc">Fãs apoiam músicos via gorjetas. Plataforma retém 5% de taxa sobre cada transação.</div>
+        <div class="r-revenue" style="color:var(--neon-green)">$3k/mês</div>
+        <div style="margin-top:6px;display:flex;gap:4px">
+          <span class="badge badge-green">5% fee</span>
+          <span class="badge badge-purple">$10 avg tip</span>
+        </div>
+      </div>
+
+      <div class="rev-card purple">
+        <div class="r-icon purple-bg">
+          <svg class="icon-lg" viewBox="0 0 24 24" stroke="var(--neon-purple)"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
+        </div>
+        <div class="r-number">Stream 6</div>
+        <h3>Marketplace Samples</h3>
+        <div class="r-desc">Venda de sample packs, presets e loops entre músicos. Comissão de 10% sobre cada venda.</div>
+        <div class="r-revenue purple-t">$2k/mês</div>
+        <div style="margin-top:6px;display:flex;gap:4px">
+          <span class="badge badge-purple">10% comissão</span>
+          <span class="badge badge-cyan">$20 avg</span>
+        </div>
+      </div>
+
+      <div class="rev-card amber">
+        <div class="r-icon amber-bg">
+          <svg class="icon-lg" viewBox="0 0 24 24" stroke="var(--neon-amber)"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+        </div>
+        <div class="r-number">Stream 7</div>
+        <h3>Publicidade de Marcas</h3>
+        <div class="r-desc">Marcas de instrumentos, áudio e música anunciam no Feed e Discover. CPM médio de $10.</div>
+        <div class="r-revenue amber-t">$5k/mês</div>
+        <div style="margin-top:6px;display:flex;gap:4px">
+          <span class="badge badge-amber">CPM $10</span>
+          <span class="badge badge-purple">500k imp.</span>
+        </div>
+      </div>
+
+      <div class="rev-card cyan">
+        <div class="r-icon cyan-bg">
+          <svg class="icon-lg" viewBox="0 0 24 24" stroke="var(--neon-cyan)"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+        </div>
+        <div class="r-number">Stream 8</div>
+        <h3>API Premium</h3>
+        <div class="r-desc">Acesso à API pública para integração de ferramentas externas, analytics e bots.</div>
+        <div class="r-revenue cyan-t">$2k/mês</div>
+        <div style="margin-top:6px;display:flex;gap:4px">
+          <span class="badge badge-cyan">$49/mês</span>
+          <span class="badge badge-purple">40 integrações</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- Comparison Table -->
+    <h2 class="section-title">Comparativo de Cenários</h2>
+    <p class="section-sub">Projeção mensal detalhada para 100k MAU</p>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Fonte de Receita</th>
+            <th style="text-align:right">Conservador</th>
+            <th style="text-align:right;color:var(--neon-purple)">Moderado ★</th>
+            <th style="text-align:right">Otimista</th>
+            <th style="text-align:right">% do Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>SoundCircle Premium</td>
+            <td style="text-align:right">$30.000</td>
+            <td style="text-align:right;color:var(--neon-purple);font-weight:600">$40.000</td>
+            <td style="text-align:right">$50.000</td>
+            <td style="text-align:right">28%</td>
+          </tr>
+          <tr>
+            <td>Collab Hub — Taxa</td>
+            <td style="text-align:right">$36.000</td>
+            <td style="text-align:right;color:var(--neon-purple);font-weight:600">$72.000</td>
+            <td style="text-align:right">$120.000</td>
+            <td style="text-align:right">50%</td>
+          </tr>
+          <tr>
+            <td>Perfil em Destaque</td>
+            <td style="text-align:right">$6.000</td>
+            <td style="text-align:right;color:var(--neon-purple);font-weight:600">$12.000</td>
+            <td style="text-align:right">$24.000</td>
+            <td style="text-align:right">8%</td>
+          </tr>
+          <tr>
+            <td>Posts Impulsionados</td>
+            <td style="text-align:right">$3.000</td>
+            <td style="text-align:right;color:var(--neon-purple);font-weight:600">$8.000</td>
+            <td style="text-align:right">$16.000</td>
+            <td style="text-align:right">6%</td>
+          </tr>
+          <tr>
+            <td>Gorjetas & Apoio</td>
+            <td style="text-align:right">$750</td>
+            <td style="text-align:right;color:var(--neon-purple);font-weight:600">$3.000</td>
+            <td style="text-align:right">$6.000</td>
+            <td style="text-align:right">2%</td>
+          </tr>
+          <tr>
+            <td>Marketplace Samples</td>
+            <td style="text-align:right">$750</td>
+            <td style="text-align:right;color:var(--neon-purple);font-weight:600">$2.000</td>
+            <td style="text-align:right">$5.000</td>
+            <td style="text-align:right">1%</td>
+          </tr>
+          <tr>
+            <td>Publicidade de Marcas</td>
+            <td style="text-align:right">$2.500</td>
+            <td style="text-align:right;color:var(--neon-purple);font-weight:600">$5.000</td>
+            <td style="text-align:right">$10.000</td>
+            <td style="text-align:right">3%</td>
+          </tr>
+          <tr>
+            <td>API Premium</td>
+            <td style="text-align:right">$500</td>
+            <td style="text-align:right;color:var(--neon-purple);font-weight:600">$2.000</td>
+            <td style="text-align:right">$5.000</td>
+            <td style="text-align:right">1%</td>
+          </tr>
+          <tr style="border-top:2px solid var(--neon-purple)">
+            <td style="font-weight:700;font-family:var(--font-display)">TOTAL MENSAL</td>
+            <td style="text-align:right;font-weight:700">$79.500</td>
+            <td style="text-align:right;font-weight:700;color:var(--neon-purple);font-size:1.1rem">$144.000</td>
+            <td style="text-align:right;font-weight:700">$236.000</td>
+            <td style="text-align:right;font-weight:700">100%</td>
+          </tr>
+          <tr>
+            <td style="font-weight:700;font-family:var(--font-display)">TOTAL ANUAL</td>
+            <td style="text-align:right;font-weight:700">$954.000</td>
+            <td style="text-align:right;font-weight:700;color:var(--neon-purple);font-size:1.1rem">$1.728.000</td>
+            <td style="text-align:right;font-weight:700">$2.832.000</td>
+            <td style="text-align:right;font-weight:700">—</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- Charts -->
+    <h2 class="section-title">Distribuição da Receita</h2>
+    <p class="section-sub">Visualização dos cenários moderado e por fonte</p>
+
+    <div class="chart-grid">
+      <div class="chart-card">
+        <h3>Receita Mensal por Fonte (moderado)</h3>
+        <div class="bar-group" style="align-items:flex-end">
+          <div class="bar-item">
+            <div class="bar-fill purple-b" style="height:56%">
+              <div class="bar-val" style="color:var(--neon-purple)">$40k</div>
+            </div>
+            <div class="bar-label">Premium</div>
+          </div>
+          <div class="bar-item">
+            <div class="bar-fill cyan-b" style="height:100%">
+              <div class="bar-val" style="color:var(--neon-cyan)">$72k</div>
+            </div>
+            <div class="bar-label">Collab</div>
+          </div>
+          <div class="bar-item">
+            <div class="bar-fill amber-b" style="height:17%">
+              <div class="bar-val" style="color:var(--neon-amber)">$12k</div>
+            </div>
+            <div class="bar-label">Perfil</div>
+          </div>
+          <div class="bar-item">
+            <div class="bar-fill rose-b" style="height:11%">
+              <div class="bar-val" style="color:var(--neon-rose)">$8k</div>
+            </div>
+            <div class="bar-label">Posts</div>
+          </div>
+          <div class="bar-item">
+            <div class="bar-fill green-b" style="height:4%">
+              <div class="bar-val" style="color:var(--neon-green);font-size:0.65rem">$3k</div>
+            </div>
+            <div class="bar-label">Gorjeta</div>
+          </div>
+          <div class="bar-item">
+            <div class="bar-fill purple-b" style="height:3%">
+              <div class="bar-val" style="color:var(--neon-purple);font-size:0.65rem">$2k</div>
+            </div>
+            <div class="bar-label">Samples</div>
+          </div>
+          <div class="bar-item">
+            <div class="bar-fill amber-b" style="height:7%">
+              <div class="bar-val" style="color:var(--neon-amber);font-size:0.65rem">$5k</div>
+            </div>
+            <div class="bar-label">Ads</div>
+          </div>
+          <div class="bar-item">
+            <div class="bar-fill cyan-b" style="height:3%">
+              <div class="bar-val" style="color:var(--neon-cyan);font-size:0.65rem">$2k</div>
+            </div>
+            <div class="bar-label">API</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="chart-card">
+        <h3>Cenários: Receita Anual</h3>
+        <div class="bar-group" style="align-items:flex-end;height:200px;justify-content:center;gap:24px">
+          <div class="bar-item" style="max-width:120px">
+            <div class="bar-fill amber-b" style="height:34%">
+              <div class="bar-val" style="color:var(--neon-amber);font-size:0.7rem">$954k</div>
+            </div>
+            <div class="bar-label">Conservador</div>
+          </div>
+          <div class="bar-item" style="max-width:120px">
+            <div class="bar-fill purple-b" style="height:62%">
+              <div class="bar-val" style="color:var(--neon-purple)">$1.73M</div>
+            </div>
+            <div class="bar-label" style="color:var(--neon-purple);font-weight:600">Moderado</div>
+          </div>
+          <div class="bar-item" style="max-width:120px">
+            <div class="bar-fill cyan-b" style="height:100%">
+              <div class="bar-val" style="color:var(--neon-cyan)">$2.83M</div>
+            </div>
+            <div class="bar-label">Otimista</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- Timeline -->
+    <h2 class="section-title">Roadmap de Monetização</h2>
+    <p class="section-sub">Evolução da receita conforme o crescimento de usuários</p>
+
+    <div class="timeline">
+      <div class="tl-card">
+        <div class="tl-dot purple-d"></div>
+        <div class="tl-phase">Fase 1</div>
+        <div class="tl-title">MVP</div>
+        <div class="tl-range">0 — 5k usuários</div>
+        <div class="tl-desc">Gratuito total. Foco em aquisição, engajamento e validação do produto. Nenhuma monetização ativa.</div>
+        <div style="margin-top:8px;color:var(--text-muted);font-size:0.72rem">Duração estimada: 2-3 meses</div>
+      </div>
+      <div class="tl-card">
+        <div class="tl-dot cyan-d"></div>
+        <div class="tl-phase">Fase 2</div>
+        <div class="tl-title">Growth</div>
+        <div class="tl-range">5k — 30k usuários</div>
+        <div class="tl-desc">Ativar Premium + Collab Hub fee. Testar featured profiles. Receita mensal estimada: $5k-$20k.</div>
+        <div style="margin-top:8px;color:var(--text-muted);font-size:0.72rem">Duração estimada: 4-6 meses</div>
+      </div>
+      <div class="tl-card">
+        <div class="tl-dot amber-d"></div>
+        <div class="tl-phase">Fase 3</div>
+        <div class="tl-title">Escala</div>
+        <div class="tl-range">30k — 100k usuários</div>
+        <div class="tl-desc">Todos os canais ativos. Marketplace, publicidade e API. Receita mensal: $50k-$144k.</div>
+        <div style="margin-top:8px;color:var(--text-muted);font-size:0.72rem">Duração estimada: 6-9 meses</div>
+      </div>
+      <div class="tl-card">
+        <div class="tl-dot green-d"></div>
+        <div class="tl-phase">Fase 4</div>
+        <div class="tl-title">Maturidade</div>
+        <div class="tl-range">100k+ usuários</div>
+        <div class="tl-desc">Maximizar ARPU, eficiência operacional, expandir ads e integrações. Margem líquida de 65%+.</div>
+        <div style="margin-top:8px;color:var(--text-muted);font-size:0.72rem">Receita anual: $1.7M+</div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- Premissas -->
+    <h2 class="section-title">Premissas do Cenário Moderado</h2>
+    <p class="section-sub">Benchmarks usados como referência para as projeções</p>
+
+    <div class="prem-grid">
+      <div class="prem-item">
+        <div class="p-key">Conversão Premium</div>
+        <div class="p-val">4%</div>
+        <div class="p-ref">LinkedIn: 3-5%</div>
+      </div>
+      <div class="prem-item">
+        <div class="p-key">Ticket Médio Collab</div>
+        <div class="p-val">$300</div>
+        <div class="p-ref">Fiverr: $200-500</div>
+      </div>
+      <div class="prem-item">
+        <div class="p-key">Transações Collab/mês</div>
+        <div class="p-val">1.600</div>
+        <div class="p-ref">20% dos 8k participantes</div>
+      </div>
+      <div class="prem-item">
+        <div class="p-key">Take Rate Collab</div>
+        <div class="p-val">15%</div>
+        <div class="p-ref">Fiverr: 20%, Upwork: 10%</div>
+      </div>
+      <div class="prem-item">
+        <div class="p-key">CPM Publicidade</div>
+        <div class="p-val">$10</div>
+        <div class="p-ref">Instagram: $5-15</div>
+      </div>
+      <div class="prem-item">
+        <div class="p-key">Churn Mensal</div>
+        <div class="p-val">8%</div>
+        <div class="p-ref">Social platforms: 5-12%</div>
+      </div>
+      <div class="prem-item">
+        <div class="p-key">CAC (Custo Aquisição)</div>
+        <div class="p-val">$8-12</div>
+        <div class="p-ref">Redes sociais de nicho</div>
+      </div>
+      <div class="prem-item">
+        <div class="p-key">Usuários p/ break-even</div>
+        <div class="p-val">50k</div>
+        <div class="p-ref">6-9 meses após atingir</div>
+      </div>
+      <div class="prem-item">
+        <div class="p-key">Investimento Inicial</div>
+        <div class="p-val">~$20k</div>
+        <div class="p-ref">Dev, infra, design, marketing</div>
+      </div>
+      <div class="prem-item">
+        <div class="p-key">Margem Líquida</div>
+        <div class="p-val">65%</div>
+        <div class="p-ref">Plataforma digital, baixo custo incremental</div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- ROI Box -->
+    <div style="background:linear-gradient(135deg,rgba(167,139,250,0.08),rgba(45,212,191,0.05));border:1px solid rgba(167,139,250,0.15);border-radius:var(--radius-lg);padding:32px;text-align:center;margin-bottom:32px">
+      <div style="font-size:0.85rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:2px;margin-bottom:8px">Resumo Executivo</div>
+      <div class="glow-number" style="font-size:3rem">$1.7M</div>
+      <div style="font-size:1.1rem;color:var(--text-secondary);margin:8px 0 16px">Receita Anual Projetada com 100k usuários</div>
+      <div style="display:flex;justify-content:center;gap:32px;flex-wrap:wrap">
+        <div>
+          <div style="font-family:var(--font-display);font-size:1.5rem;font-weight:700;color:var(--neon-cyan)">$20k</div>
+          <div style="font-size:0.78rem;color:var(--text-muted)">Investimento Inicial</div>
+        </div>
+        <div>
+          <div style="font-family:var(--font-display);font-size:1.5rem;font-weight:700;color:var(--neon-purple)">50k</div>
+          <div style="font-size:0.78rem;color:var(--text-muted)">Usuários p/ break-even</div>
+        </div>
+        <div>
+          <div style="font-family:var(--font-display);font-size:1.5rem;font-weight:700;color:var(--neon-green)">12-18</div>
+          <div style="font-size:0.78rem;color:var(--text-muted)">Meses p/ 100k usuários</div>
+        </div>
+        <div>
+          <div style="font-family:var(--font-display);font-size:1.5rem;font-weight:700;color:var(--neon-amber)">86x</div>
+          <div style="font-size:0.78rem;color:var(--text-muted)">ROI em 12 meses (moderado)</div>
+        </div>
+      </div>
+    </div>
+
+    <footer class="footer">
+      SoundCircle — Estudo de Monetização &bull; Dados projetados para 100k MAU &bull; Junho 2026
+    </footer>
+  </div>
+</body>
+</html>

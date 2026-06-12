@@ -1,0 +1,1076 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SoundCircle — Preview de Design</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-primary: #0b0b17;
+      --bg-secondary: #1a1a2e;
+      --bg-tertiary: #25253e;
+      --neon-purple: #a78bfa;
+      --neon-cyan: #2dd4bf;
+      --neon-purple-glow: rgba(167, 139, 250, 0.25);
+      --neon-cyan-glow: rgba(45, 212, 191, 0.25);
+      --text-primary: #f1f1f6;
+      --text-secondary: #9d9db5;
+      --text-muted: #6b6b85;
+      --glass-bg: rgba(26, 26, 46, 0.65);
+      --glass-border: rgba(167, 139, 250, 0.12);
+      --glass-shadow: rgba(0, 0, 0, 0.4);
+      --radius: 16px;
+      --radius-sm: 10px;
+      --radius-lg: 24px;
+      --font-display: 'Plus Jakarta Sans', sans-serif;
+      --font-body: 'DM Sans', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+      --header-h: 64px;
+      --bottom-nav-h: 68px;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: var(--font-body);
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background:
+        radial-gradient(ellipse 70% 50% at 15% 10%, rgba(167, 139, 250, 0.07) 0%, transparent 60%),
+        radial-gradient(ellipse 50% 40% at 85% 85%, rgba(45, 212, 191, 0.05) 0%, transparent 60%);
+      pointer-events: none; z-index: 0;
+    }
+    .noise-overlay {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      opacity: 0.025;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+      pointer-events: none; z-index: 1;
+    }
+    .container {
+      max-width: 1200px; margin: 0 auto; padding: 0 24px;
+      position: relative; z-index: 2;
+    }
+
+    /* Particles */
+    .particles {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      pointer-events: none; z-index: 1; overflow: hidden;
+    }
+    .particle {
+      position: absolute; width: 4px; height: 4px;
+      background: var(--neon-purple); border-radius: 50%; opacity: 0;
+      animation: float 8s infinite ease-in-out;
+    }
+    .particle:nth-child(1) { left: 10%; top: 20%; animation-delay: 0s; width: 3px; height: 3px; background: var(--neon-cyan); }
+    .particle:nth-child(2) { left: 25%; top: 60%; animation-delay: 1.2s; width: 5px; height: 5px; }
+    .particle:nth-child(3) { left: 45%; top: 15%; animation-delay: 2.4s; width: 2px; height: 2px; background: var(--neon-cyan); }
+    .particle:nth-child(4) { left: 65%; top: 70%; animation-delay: 0.8s; width: 4px; height: 4px; }
+    .particle:nth-child(5) { left: 80%; top: 30%; animation-delay: 1.8s; width: 3px; height: 3px; background: var(--neon-cyan); }
+    .particle:nth-child(6) { left: 15%; top: 85%; animation-delay: 3.0s; width: 2px; height: 2px; }
+    .particle:nth-child(7) { left: 55%; top: 45%; animation-delay: 0.5s; width: 6px; height: 6px; background: var(--neon-cyan); }
+    .particle:nth-child(8) { left: 85%; top: 12%; animation-delay: 2.0s; width: 3px; height: 3px; }
+    .particle:nth-child(9) { left: 35%; top: 88%; animation-delay: 1.5s; width: 4px; height: 4px; background: var(--neon-cyan); }
+    .particle:nth-child(10) { left: 72%; top: 52%; animation-delay: 3.5s; width: 2px; height: 2px; }
+    .particle:nth-child(11) { left: 5%; top: 50%; animation-delay: 0.3s; width: 3px; height: 3px; }
+    .particle:nth-child(12) { left: 92%; top: 75%; animation-delay: 1.7s; width: 4px; height: 4px; background: var(--neon-cyan); }
+
+    @keyframes float {
+      0%, 100% { opacity: 0; transform: translateY(0) scale(0.5); }
+      25% { opacity: 0.5; }
+      50% { opacity: 0.25; transform: translateY(-40px) scale(1); }
+      75% { opacity: 0.5; }
+    }
+
+    /* ======= HEADER ======= */
+    .header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 16px 0; margin-bottom: 32px;
+      border-bottom: 1px solid var(--glass-border);
+    }
+    .logo {
+      font-family: var(--font-display); font-size: 1.4rem; font-weight: 800;
+      background: linear-gradient(135deg, var(--neon-purple), var(--neon-cyan));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+      letter-spacing: -0.5px;
+    }
+    .nav-links { display: flex; gap: 24px; align-items: center; }
+    .nav-links a {
+      color: var(--text-secondary); text-decoration: none; font-size: 0.88rem; font-weight: 500;
+      transition: color 0.2s; position: relative;
+    }
+    .nav-links a::after {
+      content: ''; position: absolute; bottom: -4px; left: 0;
+      width: 0; height: 2px; background: var(--neon-purple); transition: width 0.3s;
+    }
+    .nav-links a:hover { color: var(--text-primary); }
+    .nav-links a:hover::after { width: 100%; }
+    .nav-links a.nav-active { color: var(--neon-purple); }
+    .nav-links a.nav-active::after { width: 100%; }
+
+    .nav-icon {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--neon-purple), #7c5cfc);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.75rem; font-weight: 700; color: #fff; cursor: pointer;
+    }
+
+    /* ======= BUTTONS ======= */
+    .btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 10px 22px; border-radius: var(--radius-sm);
+      font-family: var(--font-body); font-size: 0.88rem; font-weight: 600;
+      border: none; cursor: pointer; transition: all 0.25s;
+      text-decoration: none;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--neon-purple), #7c5cfc);
+      color: #fff; box-shadow: 0 4px 18px var(--neon-purple-glow);
+    }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(167, 139, 250, 0.35); }
+    .btn-secondary {
+      background: var(--glass-bg); backdrop-filter: blur(12px);
+      border: 1px solid var(--glass-border); color: var(--text-primary);
+    }
+    .btn-secondary:hover { background: rgba(167, 139, 250, 0.12); border-color: rgba(167, 139, 250, 0.25); transform: translateY(-2px); }
+    .btn-ghost { background: transparent; color: var(--text-secondary); }
+    .btn-ghost:hover { color: var(--text-primary); background: rgba(255,255,255,0.04); }
+    .btn-sm { padding: 6px 14px; font-size: 0.8rem; }
+    .btn-icon {
+      width: 38px; height: 38px; padding: 0; border-radius: 50%;
+      display: inline-flex; align-items: center; justify-content: center;
+    }
+
+    .badge {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 4px 12px; border-radius: 20px;
+      font-size: 0.75rem; font-weight: 500;
+    }
+    .badge-purple { background: rgba(167, 139, 250, 0.12); color: var(--neon-purple); border: 1px solid rgba(167, 139, 250, 0.18); }
+    .badge-cyan { background: rgba(45, 212, 191, 0.12); color: var(--neon-cyan); border: 1px solid rgba(45, 212, 191, 0.18); }
+    .badge-amber { background: rgba(251, 191, 36, 0.12); color: #fbbf24; border: 1px solid rgba(251, 191, 36, 0.18); }
+
+    .section-title {
+      font-family: var(--font-display); font-size: 1.8rem; font-weight: 700;
+      margin-bottom: 6px; letter-spacing: -1px;
+    }
+    .section-subtitle { color: var(--text-secondary); font-size: 1rem; margin-bottom: 32px; }
+
+    .divider {
+      height: 1px; background: var(--glass-border); margin: 40px 0;
+    }
+
+    /* ======= HERO SECTION ======= */
+    .hero {
+      text-align: center; padding: 48px 0 40px;
+    }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(167, 139, 250, 0.08); border: 1px solid rgba(167, 139, 250, 0.15);
+      border-radius: 20px; padding: 5px 14px 5px 5px;
+      font-size: 0.82rem; color: var(--neon-purple); margin-bottom: 20px;
+    }
+    .hero-badge .dot {
+      width: 8px; height: 8px; background: var(--neon-cyan);
+      border-radius: 50%; animation: pulse-dot 2s infinite;
+    }
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(1.2); }
+    }
+    .hero-title {
+      font-family: var(--font-display); font-size: clamp(2.8rem, 7vw, 5rem);
+      font-weight: 800; letter-spacing: -2px; line-height: 1.08; margin-bottom: 16px;
+    }
+    .hero-title .gradient-text {
+      background: linear-gradient(135deg, var(--neon-purple), var(--neon-cyan));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .hero-desc {
+      font-size: 1.1rem; color: var(--text-secondary);
+      max-width: 560px; margin: 0 auto 32px; line-height: 1.7;
+    }
+    .hero-actions { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+    .hero-stats {
+      display: flex; justify-content: center; gap: 48px; margin-top: 48px;
+    }
+    .hero-stat { text-align: center; }
+    .hero-stat .number {
+      font-family: var(--font-display); font-size: 1.8rem; font-weight: 700;
+      background: linear-gradient(135deg, var(--neon-purple), var(--neon-cyan));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .hero-stat .desc { font-size: 0.82rem; color: var(--text-muted); }
+
+    /* ======= ONBOARDING ======= */
+    .onboarding-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;
+    }
+    .onb-card {
+      text-align: center; padding: 36px 24px;
+      background: var(--glass-bg); backdrop-filter: blur(16px);
+      border: 1px solid var(--glass-border); border-radius: var(--radius);
+      transition: all 0.3s; position: relative; overflow: hidden;
+    }
+    .onb-card:hover { border-color: rgba(167, 139, 250, 0.25); transform: translateY(-4px); }
+    .onb-card::before {
+      content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 3px;
+      background: linear-gradient(90deg, var(--neon-purple), var(--neon-cyan)); opacity: 0; transition: opacity 0.3s;
+    }
+    .onb-card:hover::before { opacity: 1; }
+    .onb-card .step-num {
+      width: 28px; height: 28px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--neon-purple), var(--neon-cyan));
+      color: #fff; display: inline-flex; align-items: center; justify-content: center;
+      font-size: 0.75rem; font-weight: 700; margin-bottom: 16px;
+    }
+    .onb-card .icon-box {
+      width: 56px; height: 56px; border-radius: 50%; margin: 0 auto 16px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .onb-card .icon-box.purple { background: rgba(167, 139, 250, 0.12); border: 1px solid rgba(167, 139, 250, 0.18); }
+    .onb-card .icon-box.cyan { background: rgba(45, 212, 191, 0.12); border: 1px solid rgba(45, 212, 191, 0.18); }
+    .onb-card h3 { font-family: var(--font-display); font-size: 1.2rem; font-weight: 600; margin-bottom: 6px; }
+    .onb-card p { color: var(--text-secondary); font-size: 0.88rem; line-height: 1.6; }
+
+    /* ======= FEED SECTION ======= */
+    .feed-layout {
+      display: grid; grid-template-columns: 1fr 340px; gap: 28px;
+    }
+    .feed-scroll {
+      display: flex; flex-direction: column; gap: 24px;
+    }
+
+    /* Feed Post Card */
+    .post-card {
+      background: var(--glass-bg); backdrop-filter: blur(16px);
+      border: 1px solid var(--glass-border); border-radius: var(--radius);
+      overflow: hidden; transition: all 0.3s;
+    }
+    .post-card:hover { border-color: rgba(167, 139, 250, 0.2); }
+
+    .post-header {
+      display: flex; align-items: center; gap: 12px; padding: 16px 20px;
+    }
+    .post-avatar {
+      width: 42px; height: 42px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--neon-purple), #7c5cfc);
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; color: #fff; font-size: 0.9rem; flex-shrink: 0;
+    }
+    .post-user {
+      flex: 1; min-width: 0;
+    }
+    .post-user .name {
+      font-weight: 600; font-size: 0.92rem;
+    }
+    .post-user .handle {
+      font-size: 0.78rem; color: var(--text-muted);
+    }
+    .post-time {
+      font-size: 0.75rem; color: var(--text-muted);
+    }
+
+    .post-image {
+      width: 100%; height: 240px;
+      background: linear-gradient(135deg, var(--bg-tertiary), var(--bg-secondary));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.9rem; color: var(--text-muted);
+      position: relative;
+    }
+    .post-image img {
+      width: 100%; height: 100%; object-fit: cover;
+    }
+    .post-image .play-overlay {
+      position: absolute; width: 56px; height: 56px; border-radius: 50%;
+      background: rgba(0,0,0,0.6); backdrop-filter: blur(8px);
+      display: flex; align-items: center; justify-content: center; cursor: pointer;
+      transition: transform 0.2s;
+    }
+    .post-image .play-overlay:hover { transform: scale(1.1); }
+
+    .post-body {
+      padding: 12px 20px 8px;
+    }
+    .post-body p {
+      font-size: 0.9rem; line-height: 1.6; color: var(--text-secondary);
+    }
+
+    .post-audio {
+      margin: 8px 20px 12px;
+      background: var(--bg-tertiary); border-radius: var(--radius-sm);
+      padding: 10px 14px; display: flex; align-items: center; gap: 12px;
+      border: 1px solid var(--glass-border);
+    }
+    .post-audio .play-btn {
+      width: 36px; height: 36px; border-radius: 50%; border: none;
+      background: linear-gradient(135deg, var(--neon-purple), var(--neon-cyan));
+      color: #fff; display: flex; align-items: center; justify-content: center;
+      cursor: pointer; flex-shrink: 0; transition: transform 0.2s;
+    }
+    .post-audio .play-btn:hover { transform: scale(1.08); }
+    .post-audio .audio-info { flex: 1; min-width: 0; }
+    .post-audio .audio-info .track { font-size: 0.85rem; font-weight: 600; }
+    .post-audio .audio-info .artist { font-size: 0.72rem; color: var(--text-muted); }
+    .post-audio .waveform {
+      display: flex; align-items: center; gap: 3px; height: 30px;
+    }
+    .post-audio .waveform .bar {
+      width: 4px; background: linear-gradient(to top, var(--neon-purple), var(--neon-cyan));
+      border-radius: 2px; animation: wave 1.2s infinite ease-in-out;
+    }
+    .post-audio .waveform .bar:nth-child(1) { height: 35%; animation-delay: 0s; }
+    .post-audio .waveform .bar:nth-child(2) { height: 65%; animation-delay: 0.1s; }
+    .post-audio .waveform .bar:nth-child(3) { height: 50%; animation-delay: 0.2s; }
+    .post-audio .waveform .bar:nth-child(4) { height: 80%; animation-delay: 0.3s; }
+    .post-audio .waveform .bar:nth-child(5) { height: 55%; animation-delay: 0.4s; }
+    .post-audio .waveform .bar:nth-child(6) { height: 75%; animation-delay: 0.5s; }
+    .post-audio .waveform .bar:nth-child(7) { height: 40%; animation-delay: 0.6s; }
+    .post-audio .waveform .bar:nth-child(8) { height: 85%; animation-delay: 0.7s; }
+    .post-audio .waveform .bar:nth-child(9) { height: 45%; animation-delay: 0.8s; }
+    .post-audio .waveform .bar:nth-child(10) { height: 70%; animation-delay: 0.9s; }
+    @keyframes wave {
+      0%, 100% { transform: scaleY(0.6); opacity: 0.6; }
+      50% { transform: scaleY(1); opacity: 1; }
+    }
+
+    .post-actions {
+      display: flex; align-items: center; gap: 20px;
+      padding: 8px 20px 14px; border-top: 1px solid var(--glass-border);
+      margin: 0 20px;
+    }
+    .post-action {
+      display: flex; align-items: center; gap: 6px;
+      color: var(--text-muted); font-size: 0.82rem; cursor: pointer;
+      transition: color 0.2s;
+    }
+    .post-action:hover { color: var(--neon-purple); }
+    .post-action.liked { color: var(--neon-purple); }
+
+    /* Sidebar */
+    .feed-sidebar {
+      display: flex; flex-direction: column; gap: 20px;
+    }
+    .sidebar-card {
+      background: var(--glass-bg); backdrop-filter: blur(16px);
+      border: 1px solid var(--glass-border); border-radius: var(--radius);
+      padding: 20px;
+    }
+    .sidebar-card h3 {
+      font-family: var(--font-display); font-size: 1rem; font-weight: 600; margin-bottom: 14px;
+    }
+
+    .suggestion-item {
+      display: flex; align-items: center; gap: 10px; padding: 8px 0;
+      border-bottom: 1px solid var(--glass-border);
+    }
+    .suggestion-item:last-child { border-bottom: none; }
+    .suggestion-item .s-avatar {
+      width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 600; color: #fff; font-size: 0.75rem;
+    }
+    .suggestion-item .s-info { flex: 1; min-width: 0; }
+    .suggestion-item .s-info .s-name { font-size: 0.85rem; font-weight: 600; }
+    .suggestion-item .s-info .s-role { font-size: 0.75rem; color: var(--text-muted); }
+
+    .trend-item {
+      display: flex; align-items: center; gap: 10px; padding: 8px 0;
+      border-bottom: 1px solid var(--glass-border);
+    }
+    .trend-item:last-child { border-bottom: none; }
+    .trend-item .t-tag {
+      font-size: 0.82rem; font-weight: 500; color: var(--text-primary); flex: 1;
+    }
+    .trend-item .t-count { font-size: 0.72rem; color: var(--text-muted); }
+
+    /* ======= COLLAB HUB SECTION ======= */
+    .collab-toolbar {
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 12px; margin-bottom: 24px;
+    }
+    .collab-filters {
+      display: flex; gap: 8px; flex-wrap: wrap;
+    }
+    .filter-chip {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 6px 14px; border-radius: 20px; font-size: 0.8rem; font-weight: 500;
+      background: var(--glass-bg); backdrop-filter: blur(8px);
+      border: 1px solid var(--glass-border); color: var(--text-secondary);
+      cursor: pointer; transition: all 0.2s;
+    }
+    .filter-chip:hover, .filter-chip.active {
+      background: rgba(167, 139, 250, 0.12); border-color: rgba(167, 139, 250, 0.25); color: var(--neon-purple);
+    }
+
+    .collab-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px;
+    }
+
+    .collab-card {
+      background: var(--glass-bg); backdrop-filter: blur(16px);
+      border: 1px solid var(--glass-border); border-radius: var(--radius);
+      padding: 24px; transition: all 0.3s; position: relative; overflow: hidden;
+    }
+    .collab-card::before {
+      content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 3px;
+      background: linear-gradient(90deg, var(--neon-cyan), var(--neon-purple)); opacity: 0; transition: opacity 0.3s;
+    }
+    .collab-card:hover::before { opacity: 1; }
+    .collab-card:hover { border-color: rgba(167, 139, 250, 0.25); transform: translateY(-4px); }
+
+    .collab-card .c-top {
+      display: flex; align-items: flex-start; gap: 12px; margin-bottom: 14px;
+    }
+    .collab-card .c-avatar {
+      width: 44px; height: 44px; border-radius: 50%; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; color: #fff;
+    }
+    .collab-card .c-meta { flex: 1; min-width: 0; }
+    .collab-card .c-meta .c-name { font-weight: 600; font-size: 0.92rem; }
+    .collab-card .c-meta .c-role { font-size: 0.78rem; color: var(--text-muted); }
+    .collab-card .c-meta .c-time { font-size: 0.72rem; color: var(--text-muted); }
+
+    .collab-card .c-title {
+      font-family: var(--font-display); font-size: 1.1rem; font-weight: 600; margin-bottom: 6px;
+    }
+    .collab-card .c-desc {
+      font-size: 0.85rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: 14px;
+    }
+    .collab-card .c-tags {
+      display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px;
+    }
+    .collab-card .c-tag {
+      padding: 2px 10px; border-radius: 12px; font-size: 0.72rem; font-weight: 500;
+    }
+    .collab-card .c-tag.purple { background: rgba(167, 139, 250, 0.1); color: var(--neon-purple); }
+    .collab-card .c-tag.cyan { background: rgba(45, 212, 191, 0.1); color: var(--neon-cyan); }
+    .collab-card .c-tag.amber { background: rgba(251, 191, 36, 0.1); color: #fbbf24; }
+
+    .collab-card .c-footer {
+      display: flex; align-items: center; justify-content: space-between;
+      padding-top: 14px; border-top: 1px solid var(--glass-border);
+    }
+    .collab-card .c-price {
+      font-family: var(--font-display); font-size: 1.1rem; font-weight: 700;
+      color: var(--neon-cyan);
+    }
+    .collab-card .c-bids {
+      font-size: 0.78rem; color: var(--text-muted);
+    }
+
+    /* ======= PROFILE SECTION ======= */
+    .profile-card {
+      background: var(--glass-bg); backdrop-filter: blur(16px);
+      border: 1px solid var(--glass-border); border-radius: var(--radius-lg);
+      padding: 32px;
+    }
+    .profile-top {
+      display: flex; gap: 28px; align-items: flex-start;
+    }
+    .profile-avatar-lg {
+      width: 160px; height: 160px; border-radius: var(--radius);
+      background: linear-gradient(135deg, var(--neon-purple), var(--neon-cyan));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 3.2rem; font-weight: 700; color: #fff; flex-shrink: 0;
+    }
+    .profile-info-1 { flex: 1; }
+    .profile-info-1 h1 {
+      font-family: var(--font-display); font-size: 1.8rem; font-weight: 700;
+    }
+    .profile-info-1 .p-loc {
+      color: var(--text-muted); font-size: 0.9rem; margin-bottom: 8px;
+    }
+    .profile-info-1 .p-bio {
+      color: var(--text-secondary); font-size: 0.9rem; line-height: 1.7; margin-bottom: 14px; max-width: 550px;
+    }
+    .profile-info-1 .p-tags {
+      display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 16px;
+    }
+    .profile-info-1 .p-actions {
+      display: flex; gap: 10px;
+    }
+
+    .profile-stats {
+      display: flex; gap: 32px; margin-top: 24px; padding-top: 20px;
+      border-top: 1px solid var(--glass-border);
+    }
+    .p-stat { text-align: center; }
+    .p-stat .num {
+      font-family: var(--font-display); font-size: 1.3rem; font-weight: 700;
+    }
+    .p-stat .lbl { font-size: 0.78rem; color: var(--text-muted); }
+
+    .profile-tabs {
+      display: flex; gap: 24px; margin-top: 24px;
+      border-bottom: 1px solid var(--glass-border); padding-bottom: 0;
+    }
+    .profile-tab {
+      padding: 10px 0; font-size: 0.88rem; font-weight: 500;
+      color: var(--text-muted); cursor: pointer; border-bottom: 2px solid transparent;
+      transition: all 0.2s; display: flex; align-items: center; gap: 6px;
+    }
+    .profile-tab:hover { color: var(--text-secondary); }
+    .profile-tab.active { color: var(--neon-purple); border-bottom-color: var(--neon-purple); }
+
+    .post-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 16px;
+    }
+    .post-grid-item {
+      aspect-ratio: 1; border-radius: var(--radius-sm);
+      background: var(--bg-tertiary); border: 1px solid var(--glass-border);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.75rem; color: var(--text-muted); cursor: pointer;
+      transition: all 0.2s; position: relative; overflow: hidden;
+    }
+    .post-grid-item:hover { border-color: rgba(167, 139, 250, 0.25); }
+    .post-grid-item .g-overlay {
+      position: absolute; inset: 0;
+      background: rgba(167, 139, 250, 0.08); display: flex; align-items: center; justify-content: center;
+      opacity: 0; transition: opacity 0.2s; font-size: 0.85rem; color: var(--neon-purple);
+    }
+    .post-grid-item:hover .g-overlay { opacity: 1; }
+
+    /* ======= BOTTOM NAV (mobile) ======= */
+    .bottom-nav {
+      display: none;
+    }
+
+    /* ======= RESPONSIVE ======= */
+    @media (max-width: 900px) {
+      .feed-layout { grid-template-columns: 1fr; }
+      .feed-sidebar { display: none; }
+      .profile-top { flex-direction: column; align-items: center; text-align: center; }
+      .profile-info-1 .p-bio { margin: 0 auto 14px; }
+      .profile-info-1 .p-tags { justify-content: center; }
+      .profile-info-1 .p-actions { justify-content: center; }
+      .profile-stats { justify-content: center; }
+      .hero-stats { flex-direction: column; gap: 20px; }
+      .collab-grid { grid-template-columns: 1fr; }
+      .onboarding-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 600px) {
+      .nav-links a:not(.nav-keep) { display: none; }
+      .bottom-nav {
+        display: flex; position: fixed; bottom: 0; left: 0; width: 100%;
+        height: var(--bottom-nav-h); background: rgba(11, 11, 23, 0.92);
+        backdrop-filter: blur(20px); border-top: 1px solid var(--glass-border);
+        z-index: 100; align-items: center; justify-content: space-around;
+        padding: 0 12px;
+      }
+      .bnav-item {
+        display: flex; flex-direction: column; align-items: center; gap: 2px;
+        color: var(--text-muted); cursor: pointer; padding: 6px 12px;
+        transition: color 0.2s;
+      }
+      .bnav-item:hover, .bnav-item.active { color: var(--neon-purple); }
+      .bnav-item span { font-size: 0.6rem; font-weight: 500; }
+      .bnav-item .bnav-icon { width: 22px; height: 22px; }
+      body { padding-bottom: var(--bottom-nav-h); }
+      .hero { padding: 24px 0; }
+      .post-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+
+    /* SVG icon helper */
+    .icon { width: 20px; height: 20px; stroke: currentColor; stroke-width: 2; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+    .icon-sm { width: 16px; height: 16px; }
+    .icon-lg { width: 24px; height: 24px; }
+  </style>
+</head>
+<body>
+  <div class="noise-overlay"></div>
+  <div class="particles">
+    <div class="particle"></div><div class="particle"></div><div class="particle"></div><div class="particle"></div><div class="particle"></div>
+    <div class="particle"></div><div class="particle"></div><div class="particle"></div><div class="particle"></div><div class="particle"></div>
+    <div class="particle"></div><div class="particle"></div>
+  </div>
+
+  <div class="container">
+    <!-- HEADER -->
+    <header class="header">
+      <div class="logo">SoundCircle</div>
+      <nav class="nav-links">
+        <a href="#" class="nav-active">Feed</a>
+        <a href="#">Collabs</a>
+        <a href="#">Descobrir</a>
+        <a href="#" class="nav-keep">Chat</a>
+        <div class="nav-icon">VC</div>
+      </nav>
+    </header>
+
+    <!-- ===== HERO ===== -->
+    <section class="hero">
+      <div class="hero-badge">
+        <span class="dot"></span>
+        2.4k músicos ativos &middot; 32 países
+      </div>
+      <h1 class="hero-title">
+        A Rede Social dos<br>
+          <span class="gradient-text">Músicos Independentes</span>
+      </h1>
+      <p class="hero-desc">
+        SoundCircle é a rede social onde músicos compartilham seu som, se conectam com produtores e encontram collabs perfeitas. Tudo em um só lugar.
+      </p>
+      <div class="hero-actions">
+        <button class="btn btn-primary">
+          <svg class="icon" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg>
+          Criar Conta Grátis
+        </button>
+        <button class="btn btn-secondary">
+          <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
+          Explorar
+        </button>
+      </div>
+      <div class="hero-stats">
+        <div class="hero-stat"><div class="number">2.4k</div><div class="desc">Músicos</div></div>
+        <div class="hero-stat"><div class="number">847</div><div class="desc">Collabs feitas</div></div>
+        <div class="hero-stat"><div class="number">12k</div><div class="desc">Posts hoje</div></div>
+      </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- ===== ONBOARDING ===== -->
+    <section style="margin-bottom:48px">
+      <h2 class="section-title">Como funciona</h2>
+      <p class="section-subtitle">Sua jornada no SoundCircle em 3 passos</p>
+      <div class="onboarding-grid">
+        <div class="onb-card">
+          <div class="step-num">1</div>
+          <div class="icon-box purple">
+            <svg class="icon-lg" viewBox="0 0 24 24" stroke="var(--neon-purple)"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+          </div>
+          <h3>Compartilhe seu som</h3>
+          <p>Poste fotos, áudios samples e vídeos dos seus ensaios e criações. Mostre ao mundo o que você sabe fazer.</p>
+        </div>
+        <div class="onb-card">
+          <div class="step-num">2</div>
+          <div class="icon-box cyan">
+            <svg class="icon-lg" viewBox="0 0 24 24" stroke="var(--neon-cyan)"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+          </div>
+          <h3>Conecte-se</h3>
+          <p>Descubra produtores, instrumentistas e cantores. Siga, curta e comente — como em uma rede social, mas para música.</p>
+        </div>
+        <div class="onb-card">
+          <div class="step-num">3</div>
+          <div class="icon-box purple">
+            <svg class="icon-lg" viewBox="0 0 24 24" stroke="var(--neon-purple)"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          </div>
+          <h3>Collab & Renda</h3>
+          <p>Publique oportunidades ou candidate-se a projetos. Negocie valores e receba pagamentos direto na plataforma.</p>
+        </div>
+      </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- ===== FEED ===== -->
+    <section style="margin-bottom:48px">
+      <h2 class="section-title">Feed Social</h2>
+      <p class="section-subtitle">Acompanhe o que seus músicos favoritos estão criando</p>
+
+      <div class="feed-layout">
+        <div class="feed-scroll">
+          <!-- Post 1 -->
+          <div class="post-card">
+            <div class="post-header">
+              <div class="post-avatar">LM</div>
+              <div class="post-user">
+                <div class="name">Luna Martinez</div>
+                <div class="handle">@lunamartinez &middot; Baixista</div>
+              </div>
+              <div class="post-time">12 min</div>
+            </div>
+            <div class="post-body">
+              <p>Acabei de finalizar a gravação do baixo para uma track de jazz fusion. Quem topa uma collab pra finalizar os arranjos? 🎸</p>
+            </div>
+            <div class="post-audio">
+              <button class="play-btn">
+                <svg class="icon" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+              </button>
+              <div class="audio-info">
+                <div class="track">Jazz Fusion Groove — Sample</div>
+                <div class="artist">Luna Martinez</div>
+              </div>
+              <div class="waveform">
+                <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+                <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+                <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+                <div class="bar"></div>
+              </div>
+            </div>
+            <div class="post-actions">
+              <div class="post-action liked">
+                <svg class="icon-sm" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                28 curtidas
+              </div>
+              <div class="post-action">
+                <svg class="icon-sm" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                5 comentários
+              </div>
+              <div class="post-action">
+                <svg class="icon-sm" viewBox="0 0 24 24"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+                Compartilhar
+              </div>
+            </div>
+          </div>
+
+          <!-- Post 2 -->
+          <div class="post-card">
+            <div class="post-header">
+              <div class="post-avatar" style="background:linear-gradient(135deg,var(--neon-cyan),#06b6d4)">JD</div>
+              <div class="post-user">
+                <div class="name">James Duarte</div>
+                <div class="handle">@jamesduarte &middot; Guitarrista</div>
+              </div>
+              <div class="post-time">2h</div>
+            </div>
+            <div class="post-image">
+              <div style="display:flex;flex-direction:column;align-items:center;gap:8px;color:var(--text-muted)">
+                <svg class="icon-lg" viewBox="0 0 24 24" stroke="currentColor"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                Foto do ensaio
+              </div>
+              <div class="play-overlay">
+                <svg class="icon-lg" viewBox="0 0 24 24" stroke="#fff"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+              </div>
+            </div>
+            <div class="post-body">
+              <p>Ensaio de ontem. Nova pedalboard chegou e o som ficou incrível! 🔥 Quem quiser trocar uma ideia sobre timbres, chama aí!</p>
+            </div>
+            <div class="post-actions">
+              <div class="post-action">
+                <svg class="icon-sm" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                42 curtidas
+              </div>
+              <div class="post-action">
+                <svg class="icon-sm" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                8 comentários
+              </div>
+              <div class="post-action">
+                <svg class="icon-sm" viewBox="0 0 24 24"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+              </div>
+            </div>
+          </div>
+
+          <!-- Post 3 -->
+          <div class="post-card">
+            <div class="post-header">
+              <div class="post-avatar" style="background:linear-gradient(135deg,#f472b6,var(--neon-purple))">AK</div>
+              <div class="post-user">
+                <div class="name">Aiko Tanaka</div>
+                <div class="handle">@aikotanaka &middot; Produtora</div>
+              </div>
+              <div class="post-time">4h</div>
+            </div>
+            <div class="post-body">
+              <p>Produzindo uma track lo-fi e estou precisando de um saxofonista para dar aquela atmosfera nostálgica. Alguém se habilita? 🎷</p>
+            </div>
+            <div class="post-audio">
+              <button class="play-btn">
+                <svg class="icon" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+              </button>
+              <div class="audio-info">
+                <div class="track">Lo-fi Beat — Beat Base</div>
+                <div class="artist">Aiko Tanaka</div>
+              </div>
+              <div class="waveform">
+                <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+                <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+                <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+                <div class="bar"></div>
+              </div>
+            </div>
+            <div class="post-actions">
+              <div class="post-action">
+                <svg class="icon-sm" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                15 curtidas
+              </div>
+              <div class="post-action">
+                <svg class="icon-sm" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                3 comentários
+              </div>
+              <div class="post-action">
+                <svg class="icon-sm" viewBox="0 0 24 24"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SIDEBAR -->
+        <div class="feed-sidebar">
+          <div class="sidebar-card">
+            <h3>Sugestões para seguir</h3>
+            <div class="suggestion-item">
+              <div class="s-avatar" style="background:linear-gradient(135deg,#f59e0b,var(--neon-cyan))">CS</div>
+              <div class="s-info">
+                <div class="s-name">Carlos Silva</div>
+                <div class="s-role">Baterista &middot; Rio de Janeiro</div>
+              </div>
+              <button class="btn btn-primary btn-sm">Seguir</button>
+            </div>
+            <div class="suggestion-item">
+              <div class="s-avatar" style="background:linear-gradient(135deg,#ec4899,var(--neon-purple))">SN</div>
+              <div class="s-info">
+                <div class="s-name">Sofia Nakamura</div>
+                <div class="s-role">Cantora &middot; Tóquio</div>
+              </div>
+              <button class="btn btn-primary btn-sm">Seguir</button>
+            </div>
+            <div class="suggestion-item">
+              <div class="s-avatar" style="background:linear-gradient(135deg,var(--neon-purple),#7c5cfc)">MT</div>
+              <div class="s-info">
+                <div class="s-name">Marcus Turner</div>
+                <div class="s-role">Produtor &middot; Berlim</div>
+              </div>
+              <button class="btn btn-primary btn-sm">Seguir</button>
+            </div>
+          </div>
+
+          <div class="sidebar-card">
+            <h3>Trending</h3>
+            <div class="trend-item">
+              <span class="t-tag">#JazzFusion</span>
+              <span class="t-count">48 posts</span>
+            </div>
+            <div class="trend-item">
+              <span class="t-tag">#LoFiGirl</span>
+              <span class="t-count">32 posts</span>
+            </div>
+            <div class="trend-item">
+              <span class="t-tag">#BaixoGroove</span>
+              <span class="t-count">27 posts</span>
+            </div>
+            <div class="trend-item">
+              <span class="t-tag">#CollabBrasil</span>
+              <span class="t-count">21 posts</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- ===== COLLAB HUB ===== -->
+    <section style="margin-bottom:48px">
+      <h2 class="section-title">Collab Hub</h2>
+      <p class="section-subtitle">Oportunidades de colaboração entre músicos do mundo todo</p>
+
+      <div class="collab-toolbar">
+        <div class="collab-filters">
+          <span class="filter-chip active">Todas</span>
+          <span class="filter-chip">Gravação</span>
+          <span class="filter-chip">Mixagem</span>
+          <span class="filter-chip">Sessão ao vivo</span>
+          <span class="filter-chip">Composição</span>
+          <span class="filter-chip">Produção</span>
+        </div>
+        <button class="btn btn-primary">
+          <svg class="icon-sm" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Publicar Oportunidade
+        </button>
+      </div>
+
+      <div class="collab-grid">
+        <div class="collab-card">
+          <div class="c-top">
+            <div class="c-avatar" style="background:linear-gradient(135deg,#f472b6,var(--neon-purple))">AK</div>
+            <div class="c-meta">
+              <div class="c-name">Aiko Tanaka</div>
+              <div class="c-role">Produtora &middot; Tóquio</div>
+              <div class="c-time">Publicado há 3h</div>
+            </div>
+            <span class="badge badge-cyan">Aberto</span>
+          </div>
+          <div class="c-title">Procurando saxofonista para track lo-fi</div>
+          <div class="c-desc">Preciso de um saxofonista para gravar uma melodia nostálgica em uma track lo-fi que estou produzindo. Estilo John Coltrane meets Nujabes.</div>
+          <div class="c-tags">
+            <span class="c-tag purple">Saxofone</span>
+            <span class="c-tag cyan">Lo-fi</span>
+            <span class="c-tag amber">Remoto</span>
+          </div>
+          <div class="c-footer">
+            <div class="c-price">$150</div>
+            <div class="c-bids">3 candidaturas</div>
+          </div>
+        </div>
+
+        <div class="collab-card">
+          <div class="c-top">
+            <div class="c-avatar" style="background:linear-gradient(135deg,#f59e0b,var(--neon-cyan))">CS</div>
+            <div class="c-meta">
+              <div class="c-name">Carlos Silva</div>
+              <div class="c-role">Baterista &middot; Rio de Janeiro</div>
+              <div class="c-time">Publicado há 6h</div>
+            </div>
+            <span class="badge badge-cyan">Aberto</span>
+          </div>
+          <div class="c-title">Baterista disponível para gravação em estúdio</div>
+          <div class="c-desc">Ofereço gravação de bateria para sua música. Estúdio no Rio com equipamento premium. Áudio de amostra no perfil. Orçamento por música.</div>
+          <div class="c-tags">
+            <span class="c-tag purple">Bateria</span>
+            <span class="c-tag cyan">Samba</span>
+            <span class="c-tag cyan">MPB</span>
+            <span class="c-tag amber">Presencial (RJ)</span>
+          </div>
+          <div class="c-footer">
+            <div class="c-price">$80/h</div>
+            <div class="c-bids">7 candidaturas</div>
+          </div>
+        </div>
+
+        <div class="collab-card">
+          <div class="c-top">
+            <div class="c-avatar" style="background:linear-gradient(135deg,var(--neon-purple),#7c5cfc)">MT</div>
+            <div class="c-meta">
+              <div class="c-name">Marcus Turner</div>
+              <div class="c-role">Produtor &middot; Berlim</div>
+              <div class="c-time">Publicado há 1d</div>
+            </div>
+            <span class="badge badge-cyan">Aberto</span>
+          </div>
+          <div class="c-title">Preciso de guitarrista para álbum de rock progressivo</div>
+          <div class="c-desc">Estou produzindo um álbum conceitual de rock progressivo e preciso de um guitarrista criativo para gravar solos e texturas. Influências: Porcupine Tree, Steven Wilson.</div>
+          <div class="c-tags">
+            <span class="c-tag purple">Guitarra</span>
+            <span class="c-tag cyan">Rock Progressivo</span>
+            <span class="c-tag amber">Remoto</span>
+          </div>
+          <div class="c-footer">
+            <div class="c-price">$500</div>
+            <div class="c-bids">12 candidaturas</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- ===== PROFILE ===== -->
+    <section style="margin-bottom:48px">
+      <h2 class="section-title">Perfil do Músico</h2>
+      <p class="section-subtitle">Portfólio completo com posts, samples e collabs</p>
+
+      <div class="profile-card">
+        <div class="profile-top">
+          <div class="profile-avatar-lg">LM</div>
+          <div class="profile-info-1">
+            <h1>Luna Martinez</h1>
+            <div class="p-loc">São Paulo, Brasil</div>
+            <div class="p-bio">
+              Baixista profissional há 12 anos. Já toquei em festivais pela América Latina e Europa.
+              Especializada em jazz, funk e MPB. Disponível para gravações, sessões ao vivo e collabs.
+            </div>
+            <div class="p-tags">
+              <span class="badge badge-purple">Baixo</span>
+              <span class="badge badge-purple">Contrabaixo</span>
+              <span class="badge badge-cyan">Jazz</span>
+              <span class="badge badge-cyan">Funk</span>
+              <span class="badge badge-cyan">MPB</span>
+              <span class="badge badge-amber">Disponível para Collabs</span>
+            </div>
+            <div class="p-actions">
+              <button class="btn btn-primary">
+                <svg class="icon-sm" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><path d="M20 8v6"/><path d="M23 11h-6"/></svg>
+                Seguir
+              </button>
+              <button class="btn btn-secondary">
+                <svg class="icon-sm" viewBox="0 0 24 24"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg>
+                Propor Collab
+              </button>
+              <button class="btn btn-ghost">
+                <svg class="icon-sm" viewBox="0 0 24 24"><path d="M4 4v16h16"/><polyline points="20 10 12 18 8 14"/></svg>
+                Mensagem
+              </button>
+            </div>
+            <div class="profile-stats">
+              <div class="p-stat"><div class="num">2.4k</div><div class="lbl">Seguidores</div></div>
+              <div class="p-stat"><div class="num">186</div><div class="lbl">Seguindo</div></div>
+              <div class="p-stat"><div class="num">48</div><div class="lbl">Posts</div></div>
+              <div class="p-stat"><div class="num">12</div><div class="lbl">Collabs</div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="profile-tabs">
+          <div class="profile-tab active">
+            <svg class="icon-sm" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+            Posts
+          </div>
+          <div class="profile-tab">
+            <svg class="icon-sm" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            Samples
+          </div>
+          <div class="profile-tab">
+            <svg class="icon-sm" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            Collabs
+          </div>
+        </div>
+
+        <div class="post-grid">
+          <div class="post-grid-item">
+            <svg class="icon-lg" viewBox="0 0 24 24" stroke="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            <div class="g-overlay"><svg class="icon" viewBox="0 0 24 24" stroke="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg></div>
+          </div>
+          <div class="post-grid-item">
+            <svg class="icon-lg" viewBox="0 0 24 24" stroke="currentColor"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
+            <div class="g-overlay"><svg class="icon" viewBox="0 0 24 24" stroke="currentColor"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg></div>
+          </div>
+          <div class="post-grid-item">
+            <svg class="icon-lg" viewBox="0 0 24 24" stroke="currentColor"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+            <div class="g-overlay"><svg class="icon" viewBox="0 0 24 24" stroke="currentColor"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>
+          </div>
+          <div class="post-grid-item" style="background:linear-gradient(135deg,var(--neon-purple),var(--neon-cyan));color:#fff">
+            <span style="font-size:2rem;font-weight:700">+</span>
+          </div>
+          <div class="post-grid-item">
+            <svg class="icon-lg" viewBox="0 0 24 24" stroke="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            <div class="g-overlay"><svg class="icon" viewBox="0 0 24 24" stroke="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg></div>
+          </div>
+          <div class="post-grid-item">
+            <svg class="icon-lg" viewBox="0 0 24 24" stroke="currentColor"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
+            <div class="g-overlay"><svg class="icon" viewBox="0 0 24 24" stroke="currentColor"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer style="padding:24px 0;border-top:1px solid var(--glass-border);text-align:center;color:var(--text-muted);font-size:0.82rem">
+      SoundCircle &mdash; A rede social dos músicos independentes &bull; Preview de Design v2.0
+    </footer>
+  </div>
+
+  <!-- BOTTOM NAV (mobile) -->
+  <div class="bottom-nav">
+    <div class="bnav-item active">
+      <svg class="bnav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      <span>Feed</span>
+    </div>
+    <div class="bnav-item">
+      <svg class="bnav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <span>Descobrir</span>
+    </div>
+    <div class="bnav-item">
+      <svg class="bnav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+      <span>Collabs</span>
+    </div>
+    <div class="bnav-item">
+      <svg class="bnav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      <span>Chat</span>
+    </div>
+    <div class="bnav-item">
+      <svg class="bnav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      <span>Perfil</span>
+    </div>
+  </div>
+</body>
+</html>
