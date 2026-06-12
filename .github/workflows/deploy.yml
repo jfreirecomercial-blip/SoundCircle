@@ -1,14 +1,18 @@
-name: Deploy SoundCircle to Firebase
+name: Deploy Cloud Functions & Rules
 
 on:
   push:
     branches: [main]
-  pull_request:
-    branches: [main]
+    paths:
+      - 'functions/**'
+      - 'firestore.rules'
+      - 'firestore.indexes.json'
+      - 'storage.rules'
+      - 'database.rules.json'
 
 jobs:
   deploy:
-    name: Build & Deploy
+    name: Deploy Functions & Rules
     runs-on: ubuntu-latest
 
     steps:
@@ -19,19 +23,7 @@ jobs:
         with:
           node-version: '20'
           cache: 'npm'
-
-      - name: Install Dependencies
-        run: npm ci
-
-      - name: Build Next.js
-        run: npm run build
-        env:
-          NEXT_PUBLIC_FIREBASE_API_KEY: ${{ secrets.FIREBASE_API_KEY }}
-          NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: gig-match-3b114.firebaseapp.com
-          NEXT_PUBLIC_FIREBASE_PROJECT_ID: gig-match-3b114
-          NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET: gig-match-3b114.firebasestorage.app
-          NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.FIREBASE_MESSAGING_SENDER_ID }}
-          NEXT_PUBLIC_FIREBASE_APP_ID: ${{ secrets.FIREBASE_APP_ID }}
+          cache-dependency-path: './functions/package-lock.json'
 
       - name: Install Functions Dependencies
         working-directory: ./functions
